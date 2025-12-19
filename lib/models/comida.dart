@@ -1,6 +1,5 @@
 import 'package:lista_comida/entities/comidas.dart';
 
-
 class ComidaModel {
   final String id_comida;
   final String nombre_comida;

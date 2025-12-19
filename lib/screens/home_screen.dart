@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lista_comida/entities/comidas.dart';
 import 'package:lista_comida/helpers/get_cocina.dart'; //con esto puedo obtener la lista de comidas desde la api con GET
-
+import 'package:lista_comida/helpers/del_cocina.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,21 +50,63 @@ class _HomeScreenState extends State<HomeScreen> {
             ); // Mensaje si no hay registros
           }
 
-          return ListView.builder(//de esta manera se ira renderizando solo lo que se ve en pantalla
+          return ListView.builder(
+            //de esta manera se ira renderizando solo lo que se ve en pantalla
             padding: const EdgeInsets.all(12.0),
             itemCount: comidas.length,
-            itemBuilder: (context, index) {//aqui deberia empezar a dibujar
+            itemBuilder: (context, index) {
+              //aqui deberia empezar a dibujar
               final comida = comidas[index];
               return Card(
-                child: ListTile(// Item con icono, título, subtítulo y acción
+                child: ListTile(
+                  // Item con icono, título, subtítulo y acción
                   leading: Icon(Icons.food_bank_sharp, color: colors.primary),
                   title: Text(
                     '${comida.nombre_comida}-Costo:${comida.costo_comida} Gs.',
                   ),
                   subtitle: Text('Autor:${comida.autor}'),
                   trailing: IconButton(
-                    onPressed: () {},
                     icon: Icon(Icons.delete, color: colors.secondary),
+                    onPressed: () async {
+                      // Confirmación simple
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Confirmar'),
+                          content: Text('Eliminar ${comida.nombre_comida}?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true), 
+                              child: const Text('Eliminar'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm != true) return;
+
+                      try {
+                        // Lógica de DELETE separada
+                        await DelCocinaRespuesta().deleteCocina(comida.id_comida,);
+                        if (!mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Comida eliminada')),
+                        );
+
+                        // Recargar lista
+                        setState(() {
+                          _comidasfuture = GetCocinaRespuesta().getRespuesta();
+                        });
+                      } catch (e) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text('Error: $e')));
+                      }
+                    },
                   ),
                 ),
               );
