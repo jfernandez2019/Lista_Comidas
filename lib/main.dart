@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
+import 'theme/app_theme.dart';
+
+void main() {
+  runApp(const MainApp());
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: HomeScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme(selectedColor: 4).getTheme(),
+    );
+  }
+}
