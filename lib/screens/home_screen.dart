@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lista_comida/entities/comidas.dart';
 import 'package:lista_comida/helpers/get_cocina.dart'; //con esto puedo obtener la lista de comidas desde la api con GET
 import 'package:lista_comida/helpers/del_cocina.dart';
@@ -80,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: const Text('Cancelar'),
                             ),
                             TextButton(
-                              onPressed: () => Navigator.of(context).pop(true), 
+                              onPressed: () => Navigator.of(context).pop(true),
                               child: const Text('Eliminar'),
                             ),
                           ],
@@ -91,7 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       try {
                         // Lógica de DELETE separada
-                        await DelCocinaRespuesta().deleteCocina(comida.id_comida,);
+                        await DelCocinaRespuesta().deleteCocina(
+                          comida.id_comida,
+                        );
                         if (!mounted) return;
 
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -104,7 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         });
                       } catch (e) {
                         if (!mounted) return;
-                        ScaffoldMessenger.of(context,).showSnackBar(SnackBar(content: Text('Error: $e')));
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('Error: $e')));
                       }
                     },
                   ),
@@ -113,6 +118,19 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Agregar Comida',
+        onPressed: ()async{
+          //navegar con gorouter 
+          final result = await context.push<bool>('/alta-cocina');
+          if (result == true) {
+            setState(() {
+              _comidasfuture = GetCocinaRespuesta().getRespuesta(); // Si el formulario devolvió true, recarga la lista
+            });
+          }
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
